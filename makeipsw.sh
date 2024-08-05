@@ -5,7 +5,7 @@
 tmpdir=""
 
 help(){
-  echo "Usage: Makeipsw.sh <ota.zip> <donor.ipsw> <output.ipsw>"
+  echo "Usage: Makeipsw.sh <ota.zip> <donor.ipsw> <output.ipsw> [keys-zip.zip]"
 }
 
 cleanup(){
@@ -192,6 +192,7 @@ main(){
   otaPath=$1
   donorPath=$2
   outputPath=$3
+  keysPath=$4
 
   if [ "x${otaPath}" == "x" ] || [ "x${donorPath}" == "x" ] || [ "x${outputPath}" == "x" ]; then
     help
@@ -233,7 +234,8 @@ main(){
     -b "rd=md0 -v serial=3 nand-enable-reformat=1 -restore" \
     --dry-run "${targetProduct}":"${targetHardware}":1 \
     --dry-out "${ra1nsn0wdir}" \
-    --ota "${otaPath}"
+    --ota "${otaPath}" \
+    $([[ "$keysPath" ]] && echo "--keys-zip ${keysPath}")
 
   iBSSPathPart=$(plutil -extract "BuildIdentities".0.Manifest.iBSS.Info.Path raw "${ipswdir}/BuildManifest.plist")
   iBECPathPart=$(plutil -extract "BuildIdentities".0.Manifest.iBEC.Info.Path raw "${ipswdir}/BuildManifest.plist")
@@ -289,7 +291,7 @@ main(){
     exit 3
   fi
 
-
+  echo "Patching asr"
   patchasr "${mntpoint}/usr/sbin/asr"
 
   echo "Unmounting ramdisk"
