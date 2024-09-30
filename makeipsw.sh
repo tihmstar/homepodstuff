@@ -320,6 +320,14 @@ main(){
   plutil -replace "BuildIdentities".0.Info.RecoveryVariant -string "Recovery Customer Install" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
   mv -f "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
 
+  echo "Setting RecoveryVariant in BuildManifest to match Recovery Customer Install"
+  plutil -replace "BuildIdentities".0.Info.RecoveryVariant -string "Recovery Customer Install" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
+  mv -f "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
+
+  echo "Setting UniqueBuildID in BuildManifest to random UUID"
+  plutil -replace "BuildIdentities".0.UniqueBuildID -string "<$(uuidgen | sed 's/\-//g')$(uuidgen | sed 's/\-//g' | cut -c -8)>" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
+  mv -f "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
+
   echo "Compressing IPSW"
 
   (
