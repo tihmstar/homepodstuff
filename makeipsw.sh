@@ -130,6 +130,7 @@ makerootfs(){
   BUILDTRAIN="$(/usr/bin/plutil -extract "BuildIdentities".0."Info"."BuildTrain" raw -o - "${otadir}/AssetData/boot/BuildManifest.plist")"
   BUILDNUMBER="$(/usr/bin/plutil -extract "BuildIdentities".0."Info"."BuildNumber" raw -o - "${otadir}/AssetData/boot/BuildManifest.plist")"
   APTARGETTYPE="$(/usr/bin/plutil -extract "BuildIdentities".0."Ap,TargetType" raw -o - "${otadir}/AssetData/boot/BuildManifest.plist")"
+  UNIQUEBUILDID="$(/usr/bin/plutil -extract  "BuildIdentities".0."UniqueBuildID" raw -o - "${otadir}/AssetData/boot/BuildManifest.plist")"
   VOLNAME="${BUILDTRAIN}${BUILDNUMBER}.${APTARGETTYPE}OS"
   IMGSIZE_MB=$(($(sudo du -A -s -m "${rootfsdir}" | awk '{ print $1 }')+100))
   IMGNAME="$(/usr/bin/plutil -extract "BuildIdentities".0."Manifest"."OS"."Info"."Path" raw -o - "${otadir}/AssetData/boot/BuildManifest.plist")"
@@ -324,8 +325,8 @@ main(){
   plutil -replace "BuildIdentities".0.Info.RecoveryVariant -string "Recovery Customer Install" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
   mv -f "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
 
-  echo "Setting UniqueBuildID in BuildManifest to random UUID"
-  plutil -replace "BuildIdentities".0.UniqueBuildID -string "<$(uuidgen | sed 's/\-//g')$(uuidgen | sed 's/\-//g' | cut -c -8)>" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
+  echo "Setting UniqueBuildID in BuildManifest to OTA UUID"
+  plutil -replace "BuildIdentities".0.UniqueBuildID -data "${UNIQUEBUILDID}" -o "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
   mv -f "${ipswdir}/BuildManifest_new.plist" "${ipswdir}/BuildManifest.plist"
 
   echo "Compressing IPSW"
